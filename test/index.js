@@ -42,6 +42,21 @@ test('does not tolerate bad input', function (t) {
   }
 });
 
+test('it can return graph rect', function(t) {
+  var graph = createGraph();
+  graph.addLink(1, 2);
+
+  var layout = createLayout(graph.getNativeGraph());
+
+  var move = layout.step();
+  var rect = layout.getGraphRect();
+  t.ok(rect.x2 - rect.x1 > 0, 'Width is defined');
+  t.ok(rect.y2 - rect.y1 > 0, 'Height is defined');
+  t.ok(rect.z2 - rect.z1 > 0, 'Depth is defined');
+
+  t.end();
+});
+
 function verifyPositionValid(t, pos, msg) {
   t.ok(typeof pos.x === 'number', msg + ' x');
   t.ok(typeof pos.y === 'number', msg + ' y');

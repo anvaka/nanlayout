@@ -20,6 +20,7 @@ NAN_MODULE_INIT(NanLayout::Init) {
 
   Nan::SetPrototypeMethod(tpl, "step", Step);
   Nan::SetPrototypeMethod(tpl, "getNodePosition", GetNodePosition);
+  Nan::SetPrototypeMethod(tpl, "getGraphRect", GetGraphRect);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
   Nan::Set(target, Nan::New("Layout").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
@@ -57,6 +58,23 @@ NAN_METHOD(NanLayout::New) {
   }
 }
 
+NAN_METHOD(NanLayout::GetGraphRect) {
+  NanLayout* self = ObjectWrap::Unwrap<NanLayout>(info.This());
+  auto tree = self->_layout->getTree();
+  auto root = tree->getRoot();
+
+  auto rect = Nan::New<v8::Object>();
+  Nan::Set(rect, Nan::New("x1").ToLocalChecked(), Nan::New(root->left));
+  Nan::Set(rect, Nan::New("y1").ToLocalChecked(), Nan::New(root->top));
+  Nan::Set(rect, Nan::New("z1").ToLocalChecked(), Nan::New(root->back));
+  
+  Nan::Set(rect, Nan::New("x2").ToLocalChecked(), Nan::New(root->right));
+  Nan::Set(rect, Nan::New("y2").ToLocalChecked(), Nan::New(root->bottom));
+  Nan::Set(rect, Nan::New("z2").ToLocalChecked(), Nan::New(root->front));
+  
+  info.GetReturnValue().Set(rect);
+}
+
 NAN_METHOD(NanLayout::Step) {
   NanLayout* self = ObjectWrap::Unwrap<NanLayout>(info.This());
   double move = self->_layout->step();
@@ -64,11 +82,12 @@ NAN_METHOD(NanLayout::Step) {
 }
 
 NAN_METHOD(NanLayout::GetNodePosition) {
-  NanLayout* self = ObjectWrap::Unwrap<NanLayout>(info.This());
   if (info.Length() == 0) {
     Nan::ThrowError("Node id is required to be a number");
     return;
   }
+
+  NanLayout* self = ObjectWrap::Unwrap<NanLayout>(info.This());
   auto nodeIdPtr = self->_nangraph->getNodeId(info[0]);
   if (nodeIdPtr == nullptr) {
     std::string error = "Cannot find node with this id " + v8toString(info[0]);
