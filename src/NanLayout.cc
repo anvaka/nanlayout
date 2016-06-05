@@ -27,8 +27,21 @@ NAN_MODULE_INIT(NanLayout::Init) {
 
 NAN_METHOD(NanLayout::New) {
   if (info.IsConstructCall()) {
+    if (info.Length() < 1) {
+      Nan::ThrowError("Graph structure cannot be undefined");
+      return;
+    }
+    
+    NanGraph *graphWrapper;
     auto jsGraph = info[0]->ToObject();
-    NanGraph *graphWrapper = ObjectWrap::Unwrap<NanGraph>(jsGraph);
+    if (jsGraph.IsEmpty() || jsGraph->InternalFieldCount() == 0) {
+      Nan::ThrowError("Could not unwrap graph. Are you using NanGraph?");
+      return;
+    }
+
+    // TODO: How should I check whether wrapped object is NanGraph? node
+    // extensions are compiled with rtti disabled
+    graphWrapper = ObjectWrap::Unwrap<NanGraph>(jsGraph);
     NanLayout *obj = new NanLayout(graphWrapper);
 
     obj->Wrap(info.This());

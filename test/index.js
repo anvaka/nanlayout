@@ -17,6 +17,31 @@ test('it moves nodes', function(t) {
  t.end()
 });
 
+test('does not tolerate bad input', function (t) {
+  t.throws(missingGraph);
+  t.throws(invalidNodeId);
+  t.throws(notNativeGraph);
+  t.end();
+
+  function missingGraph() {
+    // graph is missing:
+    createLayout();
+  }
+
+  function notNativeGraph() {
+    var graph = createGraph();
+    var layout = createLayout(graph);
+  }
+
+  function invalidNodeId() {
+    var graph = createGraph();
+    var layout = createLayout(graph.getNativeGraph());
+
+    // we don't have nodes in the graph. This should throw:
+    layout.getNodePosition(1);
+  }
+});
+
 function verifyPositionValid(t, pos, msg) {
   t.ok(typeof pos.x === 'number', msg + ' x');
   t.ok(typeof pos.y === 'number', msg + ' y');
