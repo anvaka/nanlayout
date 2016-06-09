@@ -5,7 +5,7 @@ var suite = new Benchmark.Suite;
 
 // add tests
 suite.add('Run default', function() {
-  var graph = grid(50, 20).getNativeGraph();
+  var graph = grid(20, 20).getNativeGraph();
   var layout = require('../')(graph);
   for (var i = 0; i < 20; ++i) {
     layout.step();
