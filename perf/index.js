@@ -7,9 +7,7 @@ var suite = new Benchmark.Suite;
 suite.add('Run default', function() {
   var graph = grid(20, 20).getNativeGraph();
   var layout = require('../')(graph);
-  for (var i = 0; i < 20; ++i) {
-    layout.step();
-  }
+  layout.step(20);
 }).on('cycle', function(event) {
   console.log(String(event.target));
 })

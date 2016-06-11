@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "configure": "node-gyp configure",
+    "configure-omp": "node-gyp configure --openmp=true",
     "xcode": "node-gyp configure --debug -- -f xcode",
     "build": "node-gyp build",
     "test": "tap --node-arg=--expose-gc test/*.js"
