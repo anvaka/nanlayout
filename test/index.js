@@ -63,3 +63,22 @@ function verifyPositionValid(t, pos, msg) {
   t.ok(typeof pos.z === 'number', msg + ' z');
 }
 
+test('it can make several steps at once', function(t) {
+ var graph = createGraph();
+ graph.addLink(1, 2);
+
+ var layout1 = createLayout(graph.getNativeGraph());
+ var layout2 = createLayout(graph.getNativeGraph());
+
+ var move1 = layout1.step();
+ move1 += layout1.step();
+
+ // the code above should be equivalent to:
+ var move2 = layout2.step(2);
+
+ t.equals(move1, move2, 'Both moves are equivalent');
+ t.same(layout1.getNodePosition(1), layout2.getNodePosition(1), 'Both layouts should give the same position for node 1');
+ t.same(layout1.getNodePosition(2), layout2.getNodePosition(2), 'Both layouts should give the same position for node 2');
+
+ t.end()
+});

@@ -77,7 +77,18 @@ NAN_METHOD(NanLayout::GetGraphRect) {
 
 NAN_METHOD(NanLayout::Step) {
   NanLayout* self = ObjectWrap::Unwrap<NanLayout>(info.This());
-  double move = self->_layout->step();
+
+  int repeatCount = 1;
+  if (info.Length() > 0) {
+    repeatCount = Nan::To<double>(info[0]).FromJust();
+    if (repeatCount < 1) repeatCount = 1;
+  }
+
+  double move = 0;
+  while (repeatCount > 0) {
+    move += self->_layout->step();
+    repeatCount -= 1;
+  }
   info.GetReturnValue().Set(move);
 }
 
