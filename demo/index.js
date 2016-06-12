@@ -4,9 +4,9 @@ var fs = require('fs');
 var Canvas = require('canvas');
 
 var graph = grid(20, 20);
-var layout = require('../')(graph.getNativeGraph());
+var layout = require('../')(graph.getNativeGraph(), 2);
 
-for (var i = 0; i < 3000; ++i) {
+for (var i = 0; i < 300; ++i) {
   layout.step();
 }
 
@@ -21,8 +21,9 @@ var ctx = canvas.getContext('2d');
 //
 graph.forEachNode(function (node) {
   var pos = layout.getNodePosition(node.id);
+  console.log(pos);
   var x = pos.x - rect.x1;
-  var y = pos.z - rect.z1;
+  var y = pos.y - rect.y1;
   ctx.strokeRect(x - 5, y - 5, 10, 10);
   ctx.strokeText(node.id, x, y )
 });

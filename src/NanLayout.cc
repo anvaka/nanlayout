@@ -1,12 +1,19 @@
 #include "NanLayout.h"
 
-NanLayout::NanLayout(NanGraph* nanGraph): _nangraph(nanGraph) {
+NanLayout::NanLayout(NanGraph* nanGraph, int dimension): _nangraph(nanGraph), _dimension(dimension) {
   // TODO: Is there a chance that nanGraph is disposed during GC?
-  _layout = new ForceLayout(*_nangraph->getGraph());
+  // TODO: I need to figure out how to set dimensions at runtime, without code duplication
+  if (dimension == 2) {
+    _layout = new ForceLayout<2>(*_nangraph->getGraph());
+  } else {
+    // TOOD: This should probably throw if dimension is not 2 or 3.
+    _layout = new ForceLayout<3>(*_nangraph->getGraph());
+  }
 };
 
 NanLayout::~NanLayout() {
-  delete _layout;
+  // TODO: How do I do this correctly?
+//  delete static_cast<ForceLayout<3> *>(_layout);
 };
 
 Nan::Persistent<v8::Function> NanLayout::constructor;
@@ -40,10 +47,17 @@ NAN_METHOD(NanLayout::New) {
       return;
     }
 
+    int dimension = info[1]->IsUndefined() ? 3 : Nan::To<double>(info[1]).FromJust();
+    bool dimensionIsValid = dimension == 2 || dimension == 3;
+    if (!dimensionIsValid) {
+      Nan::ThrowError("Only 2d and 3d dimensions are supported at the moment");
+      return;
+    }
+
     // TODO: How should I check whether wrapped object is NanGraph? node
     // extensions are compiled with rtti disabled
     graphWrapper = ObjectWrap::Unwrap<NanGraph>(jsGraph);
-    NanLayout *obj = new NanLayout(graphWrapper);
+    NanLayout *obj = new NanLayout(graphWrapper, dimension);
 
     obj->Wrap(info.This());
     info.GetReturnValue().Set(info.This());
@@ -60,17 +74,26 @@ NAN_METHOD(NanLayout::New) {
 
 NAN_METHOD(NanLayout::GetGraphRect) {
   NanLayout* self = ObjectWrap::Unwrap<NanLayout>(info.This());
-  auto tree = self->_layout->getTree();
-  auto root = tree->getRoot();
-
   auto rect = Nan::New<v8::Object>();
-  Nan::Set(rect, Nan::New("x1").ToLocalChecked(), Nan::New(root->minBounds.coord[0]));
-  Nan::Set(rect, Nan::New("y1").ToLocalChecked(), Nan::New(root->minBounds.coord[1]));
-  Nan::Set(rect, Nan::New("z1").ToLocalChecked(), Nan::New(root->minBounds.coord[2]));
+  auto layout = self->_layout;
+  // TODO: how to avoid this?
+  if (self->_dimension == 2) {
+    auto root = static_cast<ForceLayout<2> *>(layout)->getTree()->getRoot();
+    Nan::Set(rect, Nan::New("x1").ToLocalChecked(), Nan::New(root->minBounds.coord[0]));
+    Nan::Set(rect, Nan::New("y1").ToLocalChecked(), Nan::New(root->minBounds.coord[1]));
+
+    Nan::Set(rect, Nan::New("x2").ToLocalChecked(), Nan::New(root->maxBounds.coord[0]));
+    Nan::Set(rect, Nan::New("y2").ToLocalChecked(), Nan::New(root->maxBounds.coord[1]));
+  } else {
+    auto root = static_cast<ForceLayout<3> *>(layout)->getTree()->getRoot();
+    Nan::Set(rect, Nan::New("x1").ToLocalChecked(), Nan::New(root->minBounds.coord[0]));
+    Nan::Set(rect, Nan::New("y1").ToLocalChecked(), Nan::New(root->minBounds.coord[1]));
+    Nan::Set(rect, Nan::New("z1").ToLocalChecked(), Nan::New(root->minBounds.coord[2]));
   
-  Nan::Set(rect, Nan::New("x2").ToLocalChecked(), Nan::New(root->maxBounds.coord[0]));
-  Nan::Set(rect, Nan::New("y2").ToLocalChecked(), Nan::New(root->maxBounds.coord[1]));
-  Nan::Set(rect, Nan::New("z2").ToLocalChecked(), Nan::New(root->maxBounds.coord[2]));
+    Nan::Set(rect, Nan::New("x2").ToLocalChecked(), Nan::New(root->maxBounds.coord[0]));
+    Nan::Set(rect, Nan::New("y2").ToLocalChecked(), Nan::New(root->maxBounds.coord[1]));
+    Nan::Set(rect, Nan::New("z2").ToLocalChecked(), Nan::New(root->maxBounds.coord[2]));
+  }
   
   info.GetReturnValue().Set(rect);
 }
@@ -85,9 +108,20 @@ NAN_METHOD(NanLayout::Step) {
   }
 
   double move = 0;
-  while (repeatCount > 0) {
-    move += self->_layout->step();
-    repeatCount -= 1;
+  if (self->_dimension == 2) {
+    auto layout = static_cast<ForceLayout<2> *>(self->_layout);
+
+    while (repeatCount > 0) {
+      move += layout->step();
+      repeatCount -= 1;
+    }
+  } else {
+    auto layout = static_cast<ForceLayout<3> *>(self->_layout);
+
+    while (repeatCount > 0) {
+      move += layout->step();
+      repeatCount -= 1;
+    }
   }
   info.GetReturnValue().Set(move);
 }
@@ -106,10 +140,22 @@ NAN_METHOD(NanLayout::GetNodePosition) {
     return;
   }
 
-  auto body = self->_layout->getBody(*nodeIdPtr);
   auto pos = Nan::New<v8::Object>();
-  Nan::Set(pos, Nan::New("x").ToLocalChecked(), Nan::New(body->pos.coord[0]));
-  Nan::Set(pos, Nan::New("y").ToLocalChecked(), Nan::New(body->pos.coord[1]));
-  Nan::Set(pos, Nan::New("z").ToLocalChecked(), Nan::New(body->pos.coord[2]));
+  if (self->_dimension == 2) {
+    auto layout = static_cast<ForceLayout<2> *>(self->_layout);
+
+    auto body = layout->getBody(*nodeIdPtr);
+
+    Nan::Set(pos, Nan::New("x").ToLocalChecked(), Nan::New(body->pos.coord[0]));
+    Nan::Set(pos, Nan::New("y").ToLocalChecked(), Nan::New(body->pos.coord[1]));
+  } else {
+    auto layout = static_cast<ForceLayout<3> *>(self->_layout);
+
+    auto body = layout->getBody(*nodeIdPtr);
+
+    Nan::Set(pos, Nan::New("x").ToLocalChecked(), Nan::New(body->pos.coord[0]));
+    Nan::Set(pos, Nan::New("y").ToLocalChecked(), Nan::New(body->pos.coord[1]));
+    Nan::Set(pos, Nan::New("z").ToLocalChecked(), Nan::New(body->pos.coord[2]));
+  }
   info.GetReturnValue().Set(pos);
 }

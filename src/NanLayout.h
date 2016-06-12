@@ -16,10 +16,11 @@ class NanLayout : public Nan::ObjectWrap {
 
  private:
   NanGraph* _nangraph;
-  ForceLayout* _layout;
+  void* _layout;
+  int _dimension;
   
   NanLayout() = delete;
-  NanLayout(NanGraph* nangraph);
+  NanLayout(NanGraph* nangraph, int dimension);
   ~NanLayout();
 
   static Nan::Persistent<v8::Function> constructor;

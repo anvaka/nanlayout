@@ -17,6 +17,22 @@ test('it moves nodes', function(t) {
  t.end()
 });
 
+test('it moves nodes in 2d', function(t) {
+ var graph = createGraph();
+ graph.addLink(1, 2);
+
+ var layout = createLayout(graph.getNativeGraph(), 2);
+
+ var move = layout.step();
+ t.ok(move > 0, 'It moves');
+
+ verifyPositionValidIn2d(t, layout.getNodePosition(1), 'Node 1 position is ok');
+ verifyPositionValidIn2d(t, layout.getNodePosition(2), 'Node 2 position is ok');
+
+ t.end()
+});
+
+
 test('does not tolerate bad input', function (t) {
   t.throws(missingGraph);
   t.throws(invalidNodeId);
@@ -57,12 +73,6 @@ test('it can return graph rect', function(t) {
   t.end();
 });
 
-function verifyPositionValid(t, pos, msg) {
-  t.ok(typeof pos.x === 'number', msg + ' x');
-  t.ok(typeof pos.y === 'number', msg + ' y');
-  t.ok(typeof pos.z === 'number', msg + ' z');
-}
-
 test('it can make several steps at once', function(t) {
  var graph = createGraph();
  graph.addLink(1, 2);
@@ -82,3 +92,16 @@ test('it can make several steps at once', function(t) {
 
  t.end()
 });
+
+function verifyPositionValid(t, pos, msg) {
+  t.ok(typeof pos.x === 'number', msg + ' x');
+  t.ok(typeof pos.y === 'number', msg + ' y');
+  t.ok(typeof pos.z === 'number', msg + ' z');
+}
+
+function verifyPositionValidIn2d(t, pos, msg) {
+  t.ok(typeof pos.x === 'number', msg + ' x');
+  t.ok(typeof pos.y === 'number', msg + ' y');
+  t.ok(pos.z === undefined, 'z should not be present');
+}
+
