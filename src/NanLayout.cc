@@ -64,13 +64,13 @@ NAN_METHOD(NanLayout::GetGraphRect) {
   auto root = tree->getRoot();
 
   auto rect = Nan::New<v8::Object>();
-  Nan::Set(rect, Nan::New("x1").ToLocalChecked(), Nan::New(root->left));
-  Nan::Set(rect, Nan::New("y1").ToLocalChecked(), Nan::New(root->top));
-  Nan::Set(rect, Nan::New("z1").ToLocalChecked(), Nan::New(root->back));
+  Nan::Set(rect, Nan::New("x1").ToLocalChecked(), Nan::New(root->minBounds.coord[0]));
+  Nan::Set(rect, Nan::New("y1").ToLocalChecked(), Nan::New(root->minBounds.coord[1]));
+  Nan::Set(rect, Nan::New("z1").ToLocalChecked(), Nan::New(root->minBounds.coord[2]));
   
-  Nan::Set(rect, Nan::New("x2").ToLocalChecked(), Nan::New(root->right));
-  Nan::Set(rect, Nan::New("y2").ToLocalChecked(), Nan::New(root->bottom));
-  Nan::Set(rect, Nan::New("z2").ToLocalChecked(), Nan::New(root->front));
+  Nan::Set(rect, Nan::New("x2").ToLocalChecked(), Nan::New(root->maxBounds.coord[0]));
+  Nan::Set(rect, Nan::New("y2").ToLocalChecked(), Nan::New(root->maxBounds.coord[1]));
+  Nan::Set(rect, Nan::New("z2").ToLocalChecked(), Nan::New(root->maxBounds.coord[2]));
   
   info.GetReturnValue().Set(rect);
 }
@@ -108,8 +108,8 @@ NAN_METHOD(NanLayout::GetNodePosition) {
 
   auto body = self->_layout->getBody(*nodeIdPtr);
   auto pos = Nan::New<v8::Object>();
-  Nan::Set(pos, Nan::New("x").ToLocalChecked(), Nan::New(body->pos.x));
-  Nan::Set(pos, Nan::New("y").ToLocalChecked(), Nan::New(body->pos.y));
-  Nan::Set(pos, Nan::New("z").ToLocalChecked(), Nan::New(body->pos.z));
+  Nan::Set(pos, Nan::New("x").ToLocalChecked(), Nan::New(body->pos.coord[0]));
+  Nan::Set(pos, Nan::New("y").ToLocalChecked(), Nan::New(body->pos.coord[1]));
+  Nan::Set(pos, Nan::New("z").ToLocalChecked(), Nan::New(body->pos.coord[2]));
   info.GetReturnValue().Set(pos);
 }
