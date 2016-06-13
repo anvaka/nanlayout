@@ -66,9 +66,9 @@ test('it can return graph rect', function(t) {
 
   var move = layout.step();
   var rect = layout.getGraphRect();
-  t.ok(rect.x2 - rect.x1 > 0, 'Width is defined');
-  t.ok(rect.y2 - rect.y1 > 0, 'Height is defined');
-  t.ok(rect.z2 - rect.z1 > 0, 'Depth is defined');
+  for (var i = 0; i < 3; ++i) {
+    t.ok(rect.max[i] - rect.min[i] > 0, 'size is defined ' + i);
+  }
 
   t.end();
 });
@@ -94,14 +94,14 @@ test('it can make several steps at once', function(t) {
 });
 
 function verifyPositionValid(t, pos, msg) {
-  t.ok(typeof pos.x === 'number', msg + ' x');
-  t.ok(typeof pos.y === 'number', msg + ' y');
-  t.ok(typeof pos.z === 'number', msg + ' z');
+  t.ok(typeof pos[0] === 'number', msg + ' x');
+  t.ok(typeof pos[1] === 'number', msg + ' y');
+  t.ok(typeof pos[2] === 'number', msg + ' z');
 }
 
 function verifyPositionValidIn2d(t, pos, msg) {
-  t.ok(typeof pos.x === 'number', msg + ' x');
-  t.ok(typeof pos.y === 'number', msg + ' y');
-  t.ok(pos.z === undefined, 'z should not be present');
+  t.ok(typeof pos[0] === 'number', msg + ' x');
+  t.ok(typeof pos[1] === 'number', msg + ' y');
+  t.ok(pos[2] === undefined, 'z should not be present');
 }
 

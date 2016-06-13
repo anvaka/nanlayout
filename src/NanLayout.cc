@@ -12,8 +12,7 @@ NanLayout::NanLayout(NanGraph* nanGraph, int dimension): _nangraph(nanGraph), _d
 };
 
 NanLayout::~NanLayout() {
-  // TODO: How do I do this correctly?
-//  delete static_cast<ForceLayout<3> *>(_layout);
+  delete _layout;
 };
 
 Nan::Persistent<v8::Function> NanLayout::constructor;
@@ -75,26 +74,26 @@ NAN_METHOD(NanLayout::New) {
 NAN_METHOD(NanLayout::GetGraphRect) {
   NanLayout* self = ObjectWrap::Unwrap<NanLayout>(info.This());
   auto rect = Nan::New<v8::Object>();
-  auto layout = self->_layout;
-  // TODO: how to avoid this?
-  if (self->_dimension == 2) {
-    auto root = static_cast<ForceLayout<2> *>(layout)->getTree()->getRoot();
-    Nan::Set(rect, Nan::New("x1").ToLocalChecked(), Nan::New(root->minBounds.coord[0]));
-    Nan::Set(rect, Nan::New("y1").ToLocalChecked(), Nan::New(root->minBounds.coord[1]));
+  auto min = Nan::New<v8::Object>();
+  auto max = Nan::New<v8::Object>();
+  auto dimension = (uint32_t)self->_dimension;
 
-    Nan::Set(rect, Nan::New("x2").ToLocalChecked(), Nan::New(root->maxBounds.coord[0]));
-    Nan::Set(rect, Nan::New("y2").ToLocalChecked(), Nan::New(root->maxBounds.coord[1]));
-  } else {
-    auto root = static_cast<ForceLayout<3> *>(layout)->getTree()->getRoot();
-    Nan::Set(rect, Nan::New("x1").ToLocalChecked(), Nan::New(root->minBounds.coord[0]));
-    Nan::Set(rect, Nan::New("y1").ToLocalChecked(), Nan::New(root->minBounds.coord[1]));
-    Nan::Set(rect, Nan::New("z1").ToLocalChecked(), Nan::New(root->minBounds.coord[2]));
-  
-    Nan::Set(rect, Nan::New("x2").ToLocalChecked(), Nan::New(root->maxBounds.coord[0]));
-    Nan::Set(rect, Nan::New("y2").ToLocalChecked(), Nan::New(root->maxBounds.coord[1]));
-    Nan::Set(rect, Nan::New("z2").ToLocalChecked(), Nan::New(root->maxBounds.coord[2]));
+  Nan::Set(min, Nan::New("length").ToLocalChecked(), Nan::New(dimension));
+  Nan::Set(max, Nan::New("length").ToLocalChecked(), Nan::New(dimension));
+
+  auto layout = self->_layout;
+  auto root = layout->getTree()->getRoot();
+  auto minBounds = root->getMin();
+  auto maxBounds = root->getMax();
+  for (uint32_t i = 0; i < dimension; ++i) {
+    auto minValue = (*minBounds)[i];
+    Nan::Set(min, i, Nan::New(minValue));
+    auto maxValue = (*maxBounds)[i];
+    Nan::Set(max, i, Nan::New(maxValue));
   }
-  
+  Nan::Set(rect, Nan::New("min").ToLocalChecked(), min);
+  Nan::Set(rect, Nan::New("max").ToLocalChecked(), max);
+
   info.GetReturnValue().Set(rect);
 }
 
@@ -108,20 +107,11 @@ NAN_METHOD(NanLayout::Step) {
   }
 
   double move = 0;
-  if (self->_dimension == 2) {
-    auto layout = static_cast<ForceLayout<2> *>(self->_layout);
+  auto layout = self->_layout;
 
-    while (repeatCount > 0) {
-      move += layout->step();
-      repeatCount -= 1;
-    }
-  } else {
-    auto layout = static_cast<ForceLayout<3> *>(self->_layout);
-
-    while (repeatCount > 0) {
-      move += layout->step();
-      repeatCount -= 1;
-    }
+  while (repeatCount > 0) {
+    move += layout->step();
+    repeatCount -= 1;
   }
   info.GetReturnValue().Set(move);
 }
@@ -141,21 +131,14 @@ NAN_METHOD(NanLayout::GetNodePosition) {
   }
 
   auto pos = Nan::New<v8::Object>();
-  if (self->_dimension == 2) {
-    auto layout = static_cast<ForceLayout<2> *>(self->_layout);
+  auto dimension = (uint32_t)self->_dimension;
+  Nan::Set(pos, Nan::New("length").ToLocalChecked(), Nan::New(dimension));
 
-    auto body = layout->getBody(*nodeIdPtr);
-
-    Nan::Set(pos, Nan::New("x").ToLocalChecked(), Nan::New(body->pos.coord[0]));
-    Nan::Set(pos, Nan::New("y").ToLocalChecked(), Nan::New(body->pos.coord[1]));
-  } else {
-    auto layout = static_cast<ForceLayout<3> *>(self->_layout);
-
-    auto body = layout->getBody(*nodeIdPtr);
-
-    Nan::Set(pos, Nan::New("x").ToLocalChecked(), Nan::New(body->pos.coord[0]));
-    Nan::Set(pos, Nan::New("y").ToLocalChecked(), Nan::New(body->pos.coord[1]));
-    Nan::Set(pos, Nan::New("z").ToLocalChecked(), Nan::New(body->pos.coord[2]));
+  auto bodyPosition = self->_layout->getBodyPosition(*nodeIdPtr);
+  for (uint32_t i = 0; i < dimension; ++i) {
+    auto value = (*bodyPosition)[i];
+    Nan::Set(pos, i, Nan::New(value));
   }
+
   info.GetReturnValue().Set(pos);
 }

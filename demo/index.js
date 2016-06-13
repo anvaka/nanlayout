@@ -12,8 +12,8 @@ for (var i = 0; i < 300; ++i) {
 
 var rect = layout.getGraphRect();
 
-var width = rect.x2 - rect.x1 + 50;
-var height = rect.y2 - rect.y1 + 50;
+var width = rect.max[0] - rect.min[0] + 50;
+var height = rect.max[1] - rect.min[1] + 50;
 var canvas = new Canvas(width, height, 'svg');
 
 var ctx = canvas.getContext('2d');
@@ -21,9 +21,8 @@ var ctx = canvas.getContext('2d');
 //
 graph.forEachNode(function (node) {
   var pos = layout.getNodePosition(node.id);
-  console.log(pos);
-  var x = pos.x - rect.x1;
-  var y = pos.y - rect.y1;
+  var x = pos[0] - rect.min[0];
+  var y = pos[1] - rect.min[1];
   ctx.strokeRect(x - 5, y - 5, 10, 10);
   ctx.strokeText(node.id, x, y )
 });

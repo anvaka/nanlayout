@@ -16,7 +16,7 @@ class NanLayout : public Nan::ObjectWrap {
 
  private:
   NanGraph* _nangraph;
-  void* _layout;
+  IForceLayout* _layout;
   int _dimension;
   
   NanLayout() = delete;
