@@ -2,7 +2,7 @@
 
 NanLayout::NanLayout(NanGraph* nanGraph, int dimension): _nangraph(nanGraph), _dimension(dimension) {
   // TODO: Is there a chance that nanGraph is disposed during GC?
-  // TODO: I need to figure out how to set dimensions at runtime, without code duplication
+  // TODO: Ideally we'd like to support higher dimensions at runtime... 
   if (dimension == 2) {
     _layout = new ForceLayout<2>(*_nangraph->getGraph());
   } else {
