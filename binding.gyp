@@ -10,7 +10,7 @@
         "<!(node -e \"require('nan')\")"
       ],
       "dependencies": [
-        "<!(node -e \"console.log(require.resolve('nangraph/binding.gyp') + ':nangraph')\")",
+        "<!(node -e \"console.log(require.resolve('nangraph/binding.gyp') + ':*')\")",
         "<!(node -e \"console.log(require.resolve('nangraph.cc/gyp/nangraph.cc.gyp') + ':nangraph')\")",
         "<!(node -e \"console.log(require.resolve('forcelayout.cc/gyp/forcelayout.cc.gyp') + ':*')\")",
       ],
