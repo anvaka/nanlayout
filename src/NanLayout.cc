@@ -26,6 +26,7 @@ NAN_MODULE_INIT(NanLayout::Init) {
 
   Nan::SetPrototypeMethod(tpl, "step", Step);
   Nan::SetPrototypeMethod(tpl, "getNodePosition", GetNodePosition);
+  Nan::SetPrototypeMethod(tpl, "setNodePosition", SetNodePosition);
   Nan::SetPrototypeMethod(tpl, "getGraphRect", GetGraphRect);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
@@ -86,7 +87,7 @@ NAN_METHOD(NanLayout::GetGraphRect) {
   auto minBounds = root->getMin();
   auto maxBounds = root->getMax();
   for (uint32_t i = 0; i < dimension; ++i) {
-    auto minValue = (*minBounds)[i];
+    double minValue = (*minBounds)[i];
     Nan::Set(min, i, Nan::New(minValue));
     auto maxValue = (*maxBounds)[i];
     Nan::Set(max, i, Nan::New(maxValue));
@@ -141,4 +142,30 @@ NAN_METHOD(NanLayout::GetNodePosition) {
   }
 
   info.GetReturnValue().Set(pos);
+}
+
+NAN_METHOD(NanLayout::SetNodePosition) {
+  if (info.Length() == 0) {
+    Nan::ThrowError("Node id is required to be a number");
+    return;
+  }
+
+  NanLayout* self = ObjectWrap::Unwrap<NanLayout>(info.This());
+  auto nodeIdPtr = self->_nangraph->getNodeId(info[0]);
+  if (nodeIdPtr == nullptr) {
+    std::string error = "Cannot find node with this id " + v8toString(info[0]);
+    Nan::ThrowError(error.c_str());
+    return;
+  }
+
+  if (info.Length() < self->_dimension + 1) {
+    std::string error = "Layout has " + std::to_string(self->_dimension) + " dimensions. setNodePosition() expects all of them";
+    Nan::ThrowError(error.c_str());
+    return;
+  }
+
+  auto bodyPosition = self->_layout->getBodyPosition(*nodeIdPtr);
+  for (int i = 0; i < self->_dimension; ++i) {
+    (*bodyPosition)[i] = Nan::To<double>(info[i + 1]).FromJust();
+  }
 }

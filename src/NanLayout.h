@@ -30,6 +30,7 @@ class NanLayout : public Nan::ObjectWrap {
   static NAN_METHOD(GetGraphRect);
   static NAN_METHOD(Step);
   static NAN_METHOD(GetNodePosition);
+  static NAN_METHOD(SetNodePosition);
 };
 
 #endif
