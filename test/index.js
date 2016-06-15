@@ -87,6 +87,37 @@ test('it can set node position', function(t) {
  t.end()
 });
 
+test('it can layout 1d graph', function(t) {
+ var graph = createGraph();
+ graph.addLink(1, 2);
+
+ var layout = createLayout(graph.getNativeGraph(), 1);
+ layout.step();
+ 
+ var pos1 = layout.getNodePosition(1);
+ var pos2 = layout.getNodePosition(2);
+
+ t.ok(pos1[0] != 0, '1 is set');
+ t.ok(pos2[0] != 0, '2 is set');
+ t.ok(pos1[0] != pos2[0], 'they are different');
+
+ t.end()
+});
+
+test('it can layout 4d graph', function(t) {
+ var graph = createGraph();
+ graph.addLink(1, 2);
+
+ var layout = createLayout(graph.getNativeGraph(), 4);
+ layout.step();
+ 
+ var pos = layout.getNodePosition(1);
+ console.log(pos);
+ t.ok(pos.length === 4, 'dimension is 4');
+
+ t.end()
+});
+
 function verifyPositionValid(t, pos, msg) {
   t.ok(typeof pos[0] === 'number', msg + ' x');
   t.ok(typeof pos[1] === 'number', msg + ' y');

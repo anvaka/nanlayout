@@ -2,9 +2,13 @@
 
 NanLayout::NanLayout(NanGraph* nanGraph, int dimension): _nangraph(nanGraph), _dimension(dimension) {
   // TODO: Is there a chance that nanGraph is disposed during GC?
-  // TODO: Ideally we'd like to support higher dimensions at runtime... 
-  if (dimension == 2) {
+  // TODO: Ideally we'd like to support higher dimensions at runtime...
+  if (dimension == 1) {
+    _layout = new ForceLayout<1>(*_nangraph->getGraph());
+  } else if (dimension == 2) {
     _layout = new ForceLayout<2>(*_nangraph->getGraph());
+  } else if (dimension == 4) {
+    _layout = new ForceLayout<4>(*_nangraph->getGraph());
   } else {
     // TOOD: This should probably throw if dimension is not 2 or 3.
     _layout = new ForceLayout<3>(*_nangraph->getGraph());
@@ -39,7 +43,7 @@ NAN_METHOD(NanLayout::New) {
       Nan::ThrowError("Graph structure cannot be undefined");
       return;
     }
-    
+
     NanGraph *graphWrapper;
     auto jsGraph = info[0]->ToObject();
     if (jsGraph.IsEmpty() || jsGraph->InternalFieldCount() == 0) {
@@ -48,9 +52,9 @@ NAN_METHOD(NanLayout::New) {
     }
 
     int dimension = info[1]->IsUndefined() ? 3 : Nan::To<double>(info[1]).FromJust();
-    bool dimensionIsValid = dimension == 2 || dimension == 3;
+    bool dimensionIsValid = dimension > 0 && dimension < 5;
     if (!dimensionIsValid) {
-      Nan::ThrowError("Only 2d and 3d dimensions are supported at the moment");
+      Nan::ThrowError("Valid dimensions are: 1d, 2d, 3d at the moment");
       return;
     }
 
