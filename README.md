@@ -43,7 +43,7 @@ brew install clang-omp
 Before compiling this library with this compiler, make sure it's exported:
 
 ```
-export CXX=`which clang-omp`
+export CXX=`which clang-omp++`
 ```
 
 It is also expected that `libiomp5` library is located at `/usr/local/lib/libiomp5.dylib`
