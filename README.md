@@ -1,6 +1,8 @@
 # nanlayout
 
-Experimental layout with node.js bindings. This is not stable by any means.
+Experimental layout with node.js bindings. It supports graph layouts in 1D, 2D,
+3D, and 4D spaces. It also can be compiled with OpenMP support, which boosts
+performance even further, by leveraging multi-threading techniques.
 
 # WARNING
 
@@ -66,3 +68,6 @@ npm run build
 
 If you run into any issues - let me know.
 
+# API
+
+It's unstable and will likely change. See `test` directory for the reference.
