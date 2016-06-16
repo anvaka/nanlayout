@@ -93,7 +93,7 @@ test('it can layout 1d graph', function(t) {
 
  var layout = createLayout(graph.getNativeGraph(), 1);
  layout.step();
- 
+
  var pos1 = layout.getNodePosition(1);
  var pos2 = layout.getNodePosition(2);
 
@@ -110,9 +110,8 @@ test('it can layout 4d graph', function(t) {
 
  var layout = createLayout(graph.getNativeGraph(), 4);
  layout.step();
- 
+
  var pos = layout.getNodePosition(1);
- console.log(pos);
  t.ok(pos.length === 4, 'dimension is 4');
 
  t.end()
