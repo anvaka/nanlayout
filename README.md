@@ -2,6 +2,10 @@
 
 Experimental layout with node.js bindings. This is not stable by any means.
 
+# WARNING
+
+This is not supposed to be used yet. Sometimes it may crash/hang.
+
 # Install
 
 Currently only OSX/Linux platforms are supported.
@@ -50,3 +54,15 @@ npm run build
 ```
 
 This should generate OpenMP build.
+
+### Linux
+
+I used gcc compiler version 4.8.4. This produced OpenMP build:
+
+```
+npm run configure-omp
+npm run build
+```
+
+If you run into any issues - let me know.
+
