@@ -1,4 +1,4 @@
-var iterationsCount = 100;
+var iterationsCount = 1000;
 var renderSvg = require('../shared/renderSvg.js');
 
 var fileName = process.argv[2];
