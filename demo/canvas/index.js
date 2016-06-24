@@ -1,10 +1,10 @@
-var grid = require('../perf/grid.js');
+var grid = require('../../perf/generate.js').grid;
 var path = require('path');
 var fs = require('fs');
 var Canvas = require('canvas');
 
-var graph = grid(20, 20);
-var layout = require('../')(graph.getNativeGraph(), 2);
+var graph = grid(5, 5);
+var layout = require('../../')(graph.getNativeGraph(), 2);
 
 for (var i = 0; i < 300; ++i) {
   layout.step();

@@ -1,4 +1,4 @@
-var grid = require('./grid.js');
+var grid = require('./generate.js').grid;
 
 var Benchmark = require('benchmark');
 var suite = new Benchmark.Suite;
