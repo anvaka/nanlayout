@@ -12,6 +12,29 @@ This is not supposed to be used yet. Sometimes it may crash/hang.
 
 Currently only OSX/Linux platforms are supported.
 
+
+## From npm
+
+This should work for OSX/Linux:
+
+```
+npm i nanlayout
+```
+
+### Multithreaded version
+
+#### OSX
+
+Make sure you have OpenMP installed. I used [clang-omp](https://clang-omp.github.io/):
+
+```
+brew install clang-omp
+export CXX=`which clang-omp++`
+npm i nanlayout --openmp=true
+```
+
+## From repository
+
 ``` shell
 git clone https://github.com/anvaka/nanlayout
 cd nanlayout
@@ -26,12 +49,12 @@ npm run configure
 npm run build
 ```
 
-## compiling with openmp
+### compiling with openmp
 
 By default the build you get from `npm run build` is single-threaded. If you want
 to create multi-threaded build, keep reading.
 
-### OSX
+#### OSX
 
 You will need to install OpenMP enabled clang compiler. I used [clang-omp](https://clang-omp.github.io/)
 during development:
@@ -57,7 +80,7 @@ npm run build
 
 This should generate OpenMP build.
 
-### Linux
+#### Linux
 
 I used gcc compiler version 4.8.4. This produced OpenMP build:
 
