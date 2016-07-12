@@ -94,3 +94,6 @@ If you run into any issues - let me know.
 # API
 
 It's unstable and will likely change. See `test` directory for the reference.
+
+TODO: I need to change how graph is passed. If it's coming from other nangraph
+module I get exceptions. It's imprtant that you graph is the same as nanlayout's
